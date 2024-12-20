@@ -45,11 +45,13 @@ The TeaFarmPro mobile app is a Flutter-based application designed to provide tea
 
 1. **Clone the Repository**  
    ```
-   git clone https://github.com/yourusername/teafarmpro-mobile.git  
+   git clone https://github.com/Dev-Kings/teafarmpro-mobile.git  
    cd teafarmpro-mobile
+   ```
 
 2. **Install Dependencies**
-    ```flutter pub get  
+    ```flutter pub get
+    ```
 
 3. **Configure Backend**
     Ensure the backend API is running and accessible.
@@ -57,6 +59,7 @@ The TeaFarmPro mobile app is a Flutter-based application designed to provide tea
 4. **Run the App**
     For Android:
     ```flutter run -d android
+    ```
 
 ## Project Structure
 ```
@@ -74,9 +77,11 @@ We welcome contributions to the TeaFarmPro mobile app! To contribute:
 
 1. Clone the Repository
 
-2. ```git clone https://github.com/yourusername/teafarmpro-mobile.git  
+2. ```
+    git clone https://github.com/Dev-Kings/teafarmpro-mobile.git  
 
-    ```git checkout -b feature/your-feature-name  
+    git checkout -b feature/your-feature-name  
+```
 
 3. Submit a Pull Request
 
