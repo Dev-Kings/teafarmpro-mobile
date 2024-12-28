@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:teafarm_pro/screens/login.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -14,7 +19,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'TEA FARM PRO',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 36, 233, 141)),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color.fromARGB(255, 36, 233, 141)),
         useMaterial3: true,
       ),
       home: LoginScreen(),
