@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (response.success) {
       // Navigate to the home screen
-      // Navigator.pushNamed(context, '/home');
+      Navigator.pushNamed(context, '/home');
     } else {
       if (mounted) {
         showDialog(
@@ -231,8 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            // Navigator.pushNamed(context, '/register');
-                            print('Register');
+                            Navigator.pushNamed(context, '/register');
                           },
                           child: TextUtil(
                             text: " Register",
