@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:teafarm_pro/utils/auth.dart';
+import 'package:teafarm_pro/utils/api.dart';
 import '../utils/text.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final response = await AuthService().login(email, password);
+    final response = await APIService().login(email, password);
 
     setState(() {
       _isLoading = false;

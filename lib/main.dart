@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:teafarm_pro/screens/home.dart';
+import 'package:teafarm_pro/screens/labour.dart';
 import 'package:teafarm_pro/screens/login.dart';
 import 'package:teafarm_pro/screens/register.dart';
 
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
               '/login': (context) => const LoginScreen(),
               '/register': (context) => const RegisterScreen(),
               '/home': (context) => const HomeScreen(),
+              '/labours': (context) => const LabourScreen(),
             },
             home: isAuthenticated ? const HomeScreen() : const LoginScreen(),
           );

@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:teafarm_pro/utils/auth.dart';
+import 'package:teafarm_pro/utils/api.dart';
 import 'package:teafarm_pro/utils/text.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -52,7 +52,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    final result = await AuthService().register(
+    final result = await APIService().register(
       name: name,
       email: email,
       phone: phone,
