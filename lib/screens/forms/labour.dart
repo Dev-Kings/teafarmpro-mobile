@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:teafarm_pro/models/labour.dart';
 import 'package:teafarm_pro/utils/api.dart';
 
-class CreateLabourScreen extends StatefulWidget {
-  const CreateLabourScreen({super.key, this.labour});
+class LabourFormScreen extends StatefulWidget {
+  const LabourFormScreen({super.key, this.labour});
   final Labour? labour;
 
   @override
-  State<CreateLabourScreen> createState() => _CreateLabourScreenState();
+  State<LabourFormScreen> createState() => _LabourFormScreenState();
 }
 
-class _CreateLabourScreenState extends State<CreateLabourScreen> {
+class _LabourFormScreenState extends State<LabourFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _labourNameController;
   late TextEditingController _labourDetailsController;

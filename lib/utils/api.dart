@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:teafarm_pro/models/employee.dart';
 import 'package:teafarm_pro/models/labour.dart';
 
 class APIResponse {
@@ -162,8 +163,6 @@ class APIService {
               }),
             ));
 
-      print(response.body);
-
       if (response.statusCode == 201 || response.statusCode == 200) {
         return APIResponse(
             success: true,
@@ -237,26 +236,124 @@ class APIService {
     }
   }
 
-  Future<String> refreshAccessToken(String refreshToken) async {
-    final Uri apiUrl = Uri.parse('$baseUrl/refresh');
+  Future<DataResponse> getEmployees() async {
+    final token = await getAccessToken();
+    final Uri apiUrl = Uri.parse('$baseUrl/employees');
 
     try {
-      final response = await http.post(
+      final response = await http.get(
         apiUrl,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $refreshToken',
+          'Authorization': 'Bearer $token',
         },
       );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
-        return data['access_token'];
+        final List<Employee> employeeList = data['employees']
+            .map<Employee>((employee) => Employee.fromJson(employee))
+            .toList();
+
+        return DataResponse(
+            success: true, message: 'Success', data: employeeList);
+      } else if (response.statusCode == 401) {
+        String refreshToken = await getRefreshToken();
+        String newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          await storeUserAndToken('access_token', newAccessToken);
+          return getEmployees();
+        } else {
+          return DataResponse(
+              success: false,
+              message: 'Invalid token. Logout then login again',
+              data: []);
+        }
       } else {
-        return '';
+        return DataResponse(success: false, message: response.body, data: []);
       }
     } catch (e) {
-      return '';
+      return DataResponse(
+          success: false, message: 'An error occurred. $e', data: []);
+    }
+  }
+
+  Future<APIResponse> saveEmployee({
+    required String name,
+    required String phoneNumber,
+    required String labourId,
+    String? email,
+    String? id, // Optional parameter for editing
+  }) async {
+    final token = await getAccessToken();
+    final Uri apiUrl = id != null
+        ? Uri.parse('$baseUrl/employees/$id') // Endpoint for editing employee
+        : Uri.parse('$baseUrl/employees'); // Endpoint for creating employee
+
+    try {
+      final response = await (id != null
+          ? http.put(
+              // Use PUT for editing
+              apiUrl,
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Authorization': 'Bearer $token',
+              },
+              body: jsonEncode(<String, String?>{
+                'id': id,
+                'name': name,
+                'phone_number': phoneNumber,
+                'email': email,
+                'labour_id': labourId,
+              }),
+            )
+          : http.post(
+              // Use POST for creating
+              apiUrl,
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Authorization': 'Bearer $token',
+              },
+              body: jsonEncode(<String, String?>{
+                'name': name,
+                'phone_number': phoneNumber,
+                'email': email,
+                'password': '12345678',
+                'labour_id': labourId,
+              }),
+            ));
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return APIResponse(
+            success: true, message: jsonDecode(response.body)['message']);
+      } else if (response.statusCode == 404) {
+        return APIResponse(success: false, message: response.body);
+      } else if (response.statusCode == 409) {
+        return APIResponse(success: false, message: 'Employee already exists');
+      } else if (response.statusCode == 400) {
+        return APIResponse(
+            success: false, message: jsonDecode(response.body)['error']);
+      } else if (response.statusCode == 401) {
+        String refreshToken = await getRefreshToken();
+        String newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          await storeUserAndToken('access_token', newAccessToken);
+          return saveEmployee(
+              name: name,
+              phoneNumber: phoneNumber,
+              labourId: labourId,
+              email: email,
+              id: id);
+        } else {
+          return APIResponse(
+              success: false,
+              message: 'Invalid token. Logout then login again');
+        }
+      } else {
+        return APIResponse(success: false, message: response.body);
+      }
+    } catch (e) {
+      return APIResponse(success: false, message: 'An error occurred');
     }
   }
 
@@ -293,6 +390,67 @@ class APIService {
       }
     } catch (e) {
       return APIResponse(success: false, message: 'An error occurred');
+    }
+  }
+
+  Future<APIResponse> deleteEmployee(String? id) async {
+    final token = await getAccessToken();
+    final Uri apiUrl = Uri.parse('$baseUrl/employees/$id');
+
+    try {
+      final response = await http.delete(
+        apiUrl,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      dynamic apiResponse = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return APIResponse(success: true, message: apiResponse['message']);
+      } else if (response.statusCode == 404) {
+        return APIResponse(success: false, message: apiResponse['error']);
+      } else if (response.statusCode == 401) {
+        String refreshToken = await getRefreshToken();
+        String newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          await storeUserAndToken('access_token', newAccessToken);
+          return deleteLabour(id);
+        } else {
+          return APIResponse(
+              success: false,
+              message: 'Invalid token. Logout then login again');
+        }
+      } else {
+        return APIResponse(success: false, message: apiResponse['error']);
+      }
+    } catch (e) {
+      return APIResponse(success: false, message: 'An error occured. $e');
+    }
+  }
+
+  Future<String> refreshAccessToken(String refreshToken) async {
+    final Uri apiUrl = Uri.parse('$baseUrl/refresh');
+
+    try {
+      final response = await http.post(
+        apiUrl,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $refreshToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return data['access_token'];
+      } else {
+        return '';
+      }
+    } catch (e) {
+      return '';
     }
   }
 

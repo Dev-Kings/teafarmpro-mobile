@@ -147,16 +147,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 10),
 
-                      // Users Card
-                      Card(
-                        color: Colors.white.withOpacity(0.7),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: ListTile(
-                          title: Text('Users'),
-                          subtitle: Text('Total Users: 120'),
-                          trailing: Icon(Icons.person),
+                      InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/employees');
+                        },
+                        child: Card(
+                          color: Colors.white.withOpacity(0.7),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: ListTile(
+                            title: Text('Employees'),
+                            subtitle: Text('Total Employees: 120'),
+                            trailing: Icon(Icons.person),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),

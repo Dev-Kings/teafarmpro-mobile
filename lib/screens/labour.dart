@@ -59,7 +59,7 @@ class _LabourScreenState extends State<LabourScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const CreateLabourScreen(),
+                  builder: (context) => const LabourFormScreen(),
                 ),
               ).then((_) {
                 fetchLabour();
@@ -147,7 +147,7 @@ class _LabourScreenState extends State<LabourScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => CreateLabourScreen(
+                                      builder: (context) => LabourFormScreen(
                                         labour: labour,
                                       ),
                                     ),

@@ -7,9 +7,9 @@ class Labour {
 
   factory Labour.fromJson(Map<String, dynamic> json) {
     return Labour(
-      id: json['id'],
-      name: json['type'],
-      details: json['description'],
+      id: json['id'] ?? '',
+      name: json['type'] ?? '',
+      details: json['description'] ?? '',
     );
   }
 }
