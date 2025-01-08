@@ -1,7 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:teafarm_pro/utils/api.dart';
+import 'package:teafarm_pro/utils/data_provider.dart';
 import '../utils/text.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -60,6 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     if (response.success) {
+      Provider.of<DataProvider>(context, listen: false).fetchInitialData();
       // Navigate to the home screen
       Navigator.pushNamed(context, '/home');
     } else {

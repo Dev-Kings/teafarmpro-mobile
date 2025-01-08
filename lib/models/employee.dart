@@ -31,7 +31,7 @@ class Employee {
   String? getLabourType(List<Labour> labourList) {
     final labour = labourList.firstWhere(
       (labour) => labour.id == labourId,
-      orElse: () => Labour(id: 'unknown', name: 'Unknown'),
+      orElse: () => Labour(id: 'unknown', name: 'Unknown', rate: 0.0),
     );
     return labour.name;
   }

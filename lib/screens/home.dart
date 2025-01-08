@@ -1,7 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:teafarm_pro/main.dart';
 import 'package:teafarm_pro/utils/api.dart';
+import 'package:teafarm_pro/utils/data_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,6 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final labourProvider = Provider.of<DataProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey.shade300,
@@ -69,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
               final response = await APIService().logout();
 
               if (response.success) {
+                Provider.of<DataProvider>(context, listen: false).clearData();
                 Navigator.pushReplacementNamed(context, '/login');
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -140,7 +145,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: ListTile(
                             title: Text('Labour Types'),
-                            subtitle: Text('Number of labour types: 5'),
+                            subtitle: Text(
+                              'Number of labour types: ${labourProvider.labours.length}',
+                            ),
                             trailing: Icon(Icons.group),
                           ),
                         ),
@@ -158,7 +165,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: ListTile(
                             title: Text('Employees'),
-                            subtitle: Text('Total Employees: 120'),
+                            subtitle: Text(
+                                'Total Employees: ${labourProvider.employees.length}'),
                             trailing: Icon(Icons.person),
                           ),
                         ),

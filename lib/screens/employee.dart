@@ -1,73 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:teafarm_pro/models/employee.dart';
-import 'package:teafarm_pro/models/labour.dart';
+import 'package:provider/provider.dart';
 import 'package:teafarm_pro/screens/forms/employee.dart';
 import 'package:teafarm_pro/utils/api.dart';
+import 'package:teafarm_pro/utils/data_provider.dart';
 
-class EmployeeScreen extends StatefulWidget {
+class EmployeeScreen extends StatelessWidget {
   const EmployeeScreen({super.key});
 
   @override
-  State<EmployeeScreen> createState() => _EmployeeScreenState();
-}
-
-class _EmployeeScreenState extends State<EmployeeScreen> {
-  final List<Employee> employees = [];
-  final List<Labour> labours = [];
-  bool isLoading = true;
-  String errorMessage = '';
-
-  @override
-  void initState() {
-    super.initState();
-    fetchEmployees();
-    fetchLabours();
-  }
-
-  Future<void> fetchEmployees() async {
-    final DataResponse response = await APIService().getEmployees();
-
-    if (response.success) {
-      setState(() {
-        employees.clear();
-        employees.addAll(response.data as List<Employee>);
-
-        isLoading = false;
-      });
-    } else {
-      setState(() {
-        errorMessage = response.message;
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text(response.message),
-        ),
-      );
-    }
-  }
-
-  Future<void> fetchLabours() async {
-    final DataResponse response = await APIService().getLabours();
-
-    if (response.success) {
-      setState(() {
-        labours.clear();
-        labours.addAll(response.data as List<Labour>);
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text(response.message),
-        ),
-      );
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final dataProvider = Provider.of<DataProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green.shade300,
@@ -80,11 +23,11 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => EmployeeFormScreen(
-                    labours: labours,
+                    labours: dataProvider.labours,
                   ),
                 ),
               ).then((_) {
-                fetchEmployees();
+                dataProvider.fetchEmployees();
               });
             },
             icon: const Icon(Icons.add),
@@ -93,11 +36,15 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: isLoading
+        child: dataProvider.isLoading
             ? const Center(child: CircularProgressIndicator())
-            : errorMessage.isNotEmpty || employees.isEmpty
+            : dataProvider.employees.isEmpty
                 ? Center(
-                    child: Text('No employees available.'),
+                    child: Text(
+                      dataProvider.errorMessage.isNotEmpty
+                          ? dataProvider.errorMessage
+                          : 'No employees found',
+                    ),
                   )
                 : SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -116,7 +63,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                         DataColumn(label: Text('Labour Type')),
                         DataColumn(label: Text('Action')),
                       ],
-                      rows: employees
+                      rows: dataProvider.employees
                           .map(
                             (employee) => DataRow(cells: [
                               DataCell(
@@ -149,7 +96,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                                 content: Text(response.message),
                                               ),
                                             );
-                                            fetchEmployees();
+                                            dataProvider.fetchEmployees();
                                           } else {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
@@ -172,7 +119,8 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                 overflow: TextOverflow.ellipsis,
                               )),
                               DataCell(Text(
-                                employee.getLabourType(labours) ?? '',
+                                employee.getLabourType(dataProvider.labours) ??
+                                    '',
                                 overflow: TextOverflow.ellipsis,
                               )),
                               DataCell(
@@ -185,11 +133,11 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                         builder: (context) =>
                                             EmployeeFormScreen(
                                           employee: employee,
-                                          labours: labours,
+                                          labours: dataProvider.labours,
                                         ),
                                       ),
                                     ).then((_) {
-                                      fetchEmployees();
+                                      dataProvider.fetchEmployees();
                                     });
                                   },
                                 ),

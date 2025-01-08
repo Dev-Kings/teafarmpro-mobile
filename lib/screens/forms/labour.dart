@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:teafarm_pro/models/labour.dart';
 import 'package:teafarm_pro/utils/api.dart';
 
@@ -14,16 +15,18 @@ class _LabourFormScreenState extends State<LabourFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _labourNameController;
   late TextEditingController _labourDetailsController;
+  late TextEditingController _rateController;
 
   @override
   void initState() {
     super.initState();
     _labourNameController = TextEditingController();
     _labourDetailsController = TextEditingController();
-
+    _rateController = TextEditingController();
     if (widget.labour != null) {
       _labourNameController.text = widget.labour!.name ?? '';
       _labourDetailsController.text = widget.labour!.details ?? '';
+      _rateController.text = widget.labour!.rate.toString();
     }
   }
 
@@ -31,6 +34,7 @@ class _LabourFormScreenState extends State<LabourFormScreen> {
   void dispose() {
     _labourNameController.dispose();
     _labourDetailsController.dispose();
+    _rateController.dispose();
     super.dispose();
   }
 
@@ -41,12 +45,14 @@ class _LabourFormScreenState extends State<LabourFormScreen> {
         id: widget.labour!.id,
         labourType: _labourNameController.text.trim(),
         description: _labourDetailsController.text.trim(),
+        rate: double.parse(_rateController.text.trim()),
       );
     } else {
       // Create new labour
       return await APIService().saveLabour(
         labourType: _labourNameController.text.trim(),
         description: _labourDetailsController.text.trim(),
+        rate: double.parse(_rateController.text.trim()),
       );
     }
   }
@@ -89,6 +95,26 @@ class _LabourFormScreenState extends State<LabourFormScreen> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter the labour details';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _rateController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                ],
+                decoration: const InputDecoration(
+                  labelText: 'Rate',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the rate';
                   }
                   return null;
                 },

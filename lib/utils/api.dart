@@ -128,6 +128,7 @@ class APIService {
   Future<APIResponse> saveLabour({
     required String labourType,
     required String description,
+    required double rate,
     String? id, // Optional parameter for editing
   }) async {
     final token = await getAccessToken();
@@ -144,10 +145,11 @@ class APIService {
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Authorization': 'Bearer $token',
               },
-              body: jsonEncode(<String, String>{
+              body: jsonEncode(<String, dynamic>{
                 'id': id,
                 'type': labourType,
                 'description': description,
+                'rate': rate,
               }),
             )
           : http.post(
@@ -157,9 +159,10 @@ class APIService {
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Authorization': 'Bearer $token',
               },
-              body: jsonEncode(<String, String>{
+              body: jsonEncode(<String, dynamic>{
                 'type': labourType,
                 'description': description,
+                'rate': rate,
               }),
             ));
 
@@ -179,7 +182,10 @@ class APIService {
         if (newAccessToken.isNotEmpty) {
           await storeUserAndToken('access_token', newAccessToken);
           return saveLabour(
-              labourType: labourType, description: description, id: id);
+              labourType: labourType,
+              description: description,
+              id: id,
+              rate: rate);
         } else {
           return APIResponse(
               success: false,
@@ -205,6 +211,8 @@ class APIService {
           'Authorization': 'Bearer $token',
         },
       );
+
+      print(response.body);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
