@@ -6,6 +6,7 @@ import 'package:teafarm_pro/screens/employee.dart';
 import 'package:teafarm_pro/screens/home.dart';
 import 'package:teafarm_pro/screens/labour.dart';
 import 'package:teafarm_pro/screens/login.dart';
+import 'package:teafarm_pro/screens/productions.dart';
 import 'package:teafarm_pro/screens/register.dart';
 import 'package:teafarm_pro/utils/data_provider.dart';
 
@@ -65,6 +66,7 @@ class MyApp extends StatelessWidget {
                 '/home': (context) => const HomeScreen(),
                 '/labours': (context) => const LabourScreen(),
                 '/employees': (context) => const EmployeeScreen(),
+                '/productions': (context) => const ProductionScreen(),
               },
               home: isAuthenticated ? const HomeScreen() : const LoginScreen(),
             ),

@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:teafarm_pro/models/employee.dart';
 import 'package:teafarm_pro/models/labour.dart';
+import 'package:teafarm_pro/models/production.dart';
 
 class APIResponse {
   final bool success;
@@ -89,7 +90,7 @@ class APIService {
         return APIResponse(success: false, message: 'An error occurred');
       }
     } catch (e) {
-      return APIResponse(success: false, message: 'An error occurred');
+      return APIResponse(success: false, message: 'An error occurred. $e');
     }
   }
 
@@ -121,7 +122,7 @@ class APIService {
         return APIResponse(success: false, message: 'An error occurred');
       }
     } catch (e) {
-      return APIResponse(success: false, message: 'An error occurred');
+      return APIResponse(success: false, message: 'An error occurred. $e');
     }
   }
 
@@ -195,7 +196,7 @@ class APIService {
         return APIResponse(success: false, message: 'An error occurred');
       }
     } catch (e) {
-      return APIResponse(success: false, message: 'An error occurred');
+      return APIResponse(success: false, message: 'An error occurred. $e');
     }
   }
 
@@ -211,8 +212,6 @@ class APIService {
           'Authorization': 'Bearer $token',
         },
       );
-
-      print(response.body);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -240,7 +239,7 @@ class APIService {
       }
     } catch (e) {
       return DataResponse(
-          success: false, message: 'An error occurred', data: []);
+          success: false, message: 'An error occurred. $e', data: []);
     }
   }
 
@@ -361,7 +360,7 @@ class APIService {
         return APIResponse(success: false, message: response.body);
       }
     } catch (e) {
-      return APIResponse(success: false, message: 'An error occurred');
+      return APIResponse(success: false, message: 'An error occurred. $e');
     }
   }
 
@@ -397,7 +396,7 @@ class APIService {
         return APIResponse(success: false, message: 'An error occurred');
       }
     } catch (e) {
-      return APIResponse(success: false, message: 'An error occurred');
+      return APIResponse(success: false, message: 'An error occurred. $e');
     }
   }
 
@@ -462,6 +461,156 @@ class APIService {
     }
   }
 
+  Future<APIResponse> saveProductionData(
+      {required String employeeId,
+      double? rate,
+      required double weight,
+      required String date,
+      String? id // Optional parameter for editing
+      }) async {
+    final token = await getAccessToken();
+    final Uri apiUrl = id != null
+        ? Uri.parse('$baseUrl/production_data/$id')
+        : Uri.parse('$baseUrl/record_production_data');
+
+    try {
+      final response = await (id != null
+          ? http.put(
+              apiUrl,
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Authorization': 'Bearer $token',
+              },
+              body: jsonEncode(<String, dynamic>{
+                'id': id,
+                'employee_id': employeeId,
+                'rate': rate,
+                'weight': weight,
+                'date': date,
+              }),
+            )
+          : http.post(
+              apiUrl,
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Authorization': 'Bearer $token',
+              },
+              body: jsonEncode(<String, dynamic>{
+                'employee_id': employeeId,
+                'rate': rate,
+                'weight': weight,
+                'date': date,
+              }),
+            ));
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return APIResponse(
+            success: true, message: jsonDecode(response.body)['message']);
+      } else if (response.statusCode == 404) {
+        return APIResponse(success: false, message: response.body);
+      } else if (response.statusCode == 400) {
+        return APIResponse(
+            success: false, message: jsonDecode(response.body)['error']);
+      } else if (response.statusCode == 401) {
+        String refreshToken = await getRefreshToken();
+        String newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          await storeUserAndToken('access_token', newAccessToken);
+          return saveProductionData(
+              employeeId: employeeId, rate: rate, weight: weight, date: date);
+        } else {
+          return APIResponse(
+              success: false,
+              message: 'Invalid token. Logout then login again');
+        }
+      } else {
+        return APIResponse(success: false, message: response.body);
+      }
+    } catch (e) {
+      return APIResponse(success: false, message: 'An error occurred. $e');
+    }
+  }
+
+  Future<DataResponse> getProductions() async {
+    final token = await getAccessToken();
+    final Uri apiUrl = Uri.parse('$baseUrl/fetch_production_data');
+
+    try {
+      final response = await http.get(
+        apiUrl,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        final List<Production> productionList = data['productions']
+            .map<Production>((production) => Production.fromJson(production))
+            .toList();
+
+        return DataResponse(
+            success: true, message: 'Success', data: productionList);
+      } else if (response.statusCode == 401) {
+        String refreshToken = await getRefreshToken();
+        String newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          await storeUserAndToken('access_token', newAccessToken);
+          return getProductions();
+        } else {
+          return DataResponse(
+              success: false,
+              message: 'Invalid token. Logout then login again',
+              data: []);
+        }
+      } else {
+        return DataResponse(
+            success: false, message: 'An error occurred', data: []);
+      }
+    } catch (e) {
+      return DataResponse(
+          success: false, message: 'An error occurred. $e', data: []);
+    }
+  }
+
+  Future<APIResponse> deleteProduction(String id) async {
+    final token = await getAccessToken();
+    final Uri apiUrl = Uri.parse('$baseUrl/delete_production_data/$id');
+
+    try {
+      final response = await http.delete(
+        apiUrl,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseBody = jsonDecode(response.body);
+        return APIResponse(success: true, message: responseBody['message']);
+      } else if (response.statusCode == 404) {
+        return APIResponse(success: false, message: 'Production not found');
+      } else if (response.statusCode == 401) {
+        String refreshToken = await getRefreshToken();
+        String newAccessToken = await refreshAccessToken(refreshToken);
+        if (newAccessToken.isNotEmpty) {
+          await storeUserAndToken('access_token', newAccessToken);
+          return deleteProduction(id);
+        } else {
+          return APIResponse(
+              success: false,
+              message: 'Invalid token. Logout then login again');
+        }
+      } else {
+        return APIResponse(success: false, message: 'An error occurred');
+      }
+    } catch (e) {
+      return APIResponse(success: false, message: 'An error occurred. $e');
+    }
+  }
+
   Future<APIResponse> logout() async {
     final Uri apiUrl = Uri.parse('$baseUrl/logout');
 
@@ -493,7 +642,7 @@ class APIService {
             success: false, message: error ?? 'An error occurred');
       }
     } catch (e) {
-      return APIResponse(success: false, message: 'An error occurred');
+      return APIResponse(success: false, message: 'An error occurred. $e');
     }
   }
 }

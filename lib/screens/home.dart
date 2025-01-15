@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -174,15 +176,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 10),
 
                       // Monthly Production Card
-                      Card(
-                        color: Colors.white.withOpacity(0.7),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: ListTile(
-                          title: Text('Monthly Production'),
-                          subtitle: Text('Production: 5000 kg'),
-                          trailing: Icon(Icons.access_time),
+                      InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/productions');
+                        },
+                        child: Card(
+                          color: Colors.white.withOpacity(0.7),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: ListTile(
+                            title: Text('Monthly Payout'),
+                            subtitle: Text(
+                                'Total: Kshs. ${labourProvider.productions.fold(
+                              0.0,
+                              (sum, element) =>
+                                  sum + element.rate * element.weight,
+                            )}'),
+                            trailing: Icon(Icons.access_time),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -194,8 +206,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: ListTile(
-                          title: Text('Weekly Production'),
-                          subtitle: Text('Production: 1200 kg'),
+                          title: Text('Weekly Payout'),
+                          subtitle: Text('Total: Kshs. 0.00'),
                           trailing: Icon(Icons.access_alarm),
                         ),
                       ),

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:teafarm_pro/screens/forms/labour.dart';
@@ -118,7 +120,8 @@ class LabourScreen extends StatelessWidget {
                               DataCell(Text(labour.rate.toString())),
                               DataCell(
                                 ActionChip(
-                                  label: const Text('Edit'),
+                                  backgroundColor: Colors.green.shade200,
+                                  label: Icon(Icons.edit),
                                   onPressed: () {
                                     Navigator.push(
                                       context,
