@@ -1,7 +1,29 @@
 # TeaFarmPro Mobile App  
 
 ## Overview  
-The TeaFarmPro mobile app is a Flutter-based application designed to provide tea farmers with an efficient and intuitive way to manage their farms. The app allows users to track production, assign tasks, manage inventory, monitor expenses, and access reports—all from the convenience of their mobile devices.  
+The TeaFarmPro mobile app is a Flutter-based application designed to provide tea farmers with an efficient and intuitive way to manage their farms. The app allows users to track production, assign tasks, manage inventory, monitor expenses, and access reports—all from the convenience of their mobile devices.
+
+## App Images
+
+1. ![Login Screen](/assets/images/phone1.png)
+
+2. ![Register Screen](/assets/images/phone2.png)
+
+3. ![Home Screen](/assets/images/phone3.png)
+
+4. ![Labour Screen](/assets/images/phone4.png)
+
+5. ![Add Labour Screen](/assets/images/phone8.png)
+
+6. ![Employees Screen](/assets/images/phone5.png)
+
+7. ![Add Employee Screen](/assets/images/phone9.png)
+
+8. ![Production Records Screen](/assets/images/phone6.png)
+
+9. ![Add Production Record Screen](/assets/images/phone10.png)
+
+10. ![Logout Screen](/assets/images/phone7.png)
 
 ## Features  
 
