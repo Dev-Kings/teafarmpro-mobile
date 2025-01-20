@@ -20,7 +20,7 @@ class DataResponse extends APIResponse {
 }
 
 class APIService {
-  final String baseUrl = 'http://10.0.2.2:5000/api';
+  final String baseUrl = 'https://api.kingasia.tech/api';
 
   final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
